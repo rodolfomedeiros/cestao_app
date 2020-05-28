@@ -1,8 +1,9 @@
-import 'package:cestao_app/models/SearchForm.dart';
 import 'package:flutter/material.dart';
 
-class SearchResultView extends StatefulWidget {
-  SearchResultView({Key key, this.title}) : super(key: key);
+import 'package:cestao_app/models/ItemsSearchForm.dart';
+
+class ItemsSearchResultView extends StatefulWidget {
+  ItemsSearchResultView({Key key, this.title}) : super(key: key);
 
   static const String routeName = "/search/result";
 
@@ -12,10 +13,11 @@ class SearchResultView extends StatefulWidget {
   _SearchResultState createState() => _SearchResultState();
 }
 
-class _SearchResultState extends State<SearchResultView> {
+class _SearchResultState extends State<ItemsSearchResultView> {
   @override
   Widget build(BuildContext context) {
-    final SearchForm searchForm = ModalRoute.of(context).settings.arguments;
+    final ItemsSearchForm searchForm =
+        ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
       appBar: AppBar(

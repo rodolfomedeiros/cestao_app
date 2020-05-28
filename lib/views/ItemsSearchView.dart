@@ -1,19 +1,19 @@
-import 'package:cestao_app/SearchResultView.dart';
-import 'package:cestao_app/models/SearchForm.dart';
+import 'package:cestao_app/views/ItemsSearchResultView.dart';
+import 'package:cestao_app/models/ItemsSearchForm.dart';
 import 'package:flutter/material.dart';
 
-class SearchView extends StatefulWidget {
-  SearchView({Key key, this.title}) : super(key: key);
+class ItemsSearchView extends StatefulWidget {
+  ItemsSearchView({Key key, this.title}) : super(key: key);
 
   static const String routeName = "/search";
 
   final String title;
 
   @override
-  _SearchViewState createState() => _SearchViewState();
+  _ItemsSearchViewState createState() => _ItemsSearchViewState();
 }
 
-class _SearchViewState extends State<SearchView> {
+class _ItemsSearchViewState extends State<ItemsSearchView> {
   final searchFieldController = TextEditingController();
 
   @override
@@ -40,8 +40,8 @@ class _SearchViewState extends State<SearchView> {
               ),
               RaisedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, SearchResultView.routeName,
-                      arguments: SearchForm(searchFieldController.text));
+                  Navigator.pushNamed(context, ItemsSearchResultView.routeName,
+                      arguments: ItemsSearchForm(searchFieldController.text));
                 },
                 child: Text(
                   'Buscar',
