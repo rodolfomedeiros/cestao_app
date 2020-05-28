@@ -14,3 +14,8 @@ Future<ItemsSearchForm> search(ItemsSearchForm search) async {
     throw Exception('search failed');
   }
 }
+
+Future<ItemsSearchForm> searchDefault(ItemsSearchForm search) {
+  return Future.delayed(
+      Duration(seconds: 3), () => ItemsSearchForm(query: 'teste'));
+}

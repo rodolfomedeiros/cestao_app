@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 
 import 'package:cestao_app/models/ItemsSearchForm.dart';
@@ -19,11 +17,7 @@ class ItemsSearchResultView extends StatefulWidget {
 class _SearchResultState extends State<ItemsSearchResultView> {
   @override
   Widget build(BuildContext context) {
-    final ItemsSearchForm searchForm =
-        ModalRoute.of(context).settings.arguments;
-
-    // cestaoService.search(searchForm).then((value) =>
-    //     value.soldItemsByBusiness.forEach((element) => print(element)));
+    ItemsSearchForm searchForm = ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
       appBar: AppBar(
