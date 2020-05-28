@@ -41,7 +41,8 @@ class _ItemsSearchViewState extends State<ItemsSearchView> {
               RaisedButton(
                 onPressed: () {
                   Navigator.pushNamed(context, ItemsSearchResultView.routeName,
-                      arguments: ItemsSearchForm(searchFieldController.text));
+                      arguments:
+                          ItemsSearchForm(query: searchFieldController.text));
                 },
                 child: Text(
                   'Buscar',
