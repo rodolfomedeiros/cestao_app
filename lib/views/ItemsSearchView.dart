@@ -2,6 +2,9 @@ import 'package:cestao_app/views/ItemsSearchResultView.dart';
 import 'package:cestao_app/models/ItemsSearchForm.dart';
 import 'package:flutter/material.dart';
 
+import 'package:loading/loading.dart';
+import 'package:loading/indicator/ball_spin_fade_loader_indicator.dart';
+
 class ItemsSearchView extends StatefulWidget {
   ItemsSearchView({Key key, this.title}) : super(key: key);
 
@@ -28,16 +31,26 @@ class _ItemsSearchViewState extends State<ItemsSearchView> {
       appBar: AppBar(
         title: Text('Search View'),
       ),
-      body: Center(
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+      body: Container(
+        padding: EdgeInsets.all(20.0),
+        child:
+            Column(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
+          Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Loading(
+                    indicator: BallSpinFadeLoaderIndicator(),
+                    color: Theme.of(context).primaryColor,
+                    size: 100.0)
+              ]),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              TextField(
+              Expanded(
+                  child: TextField(
                 style: TextStyle(fontSize: 20.0),
                 controller: searchFieldController,
-              ),
+              )),
               RaisedButton(
                 onPressed: () {
                   Navigator.pushNamed(context, ItemsSearchResultView.routeName,
@@ -51,8 +64,8 @@ class _ItemsSearchViewState extends State<ItemsSearchView> {
                 color: Theme.of(context).primaryColor,
               )
             ],
-          ),
-        ),
+          )
+        ]),
       ),
     );
   }
