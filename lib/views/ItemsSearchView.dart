@@ -3,7 +3,7 @@ import 'package:cestao_app/models/ItemsSearchForm.dart';
 import 'package:flutter/material.dart';
 
 import 'package:loading/loading.dart';
-import 'package:loading/indicator/ball_scale_multiple_indicator.dart';
+import 'package:loading/indicator/ball_pulse_indicator.dart';
 
 class ItemsSearchView extends StatefulWidget {
   ItemsSearchView({Key key, this.title}) : super(key: key);
@@ -64,14 +64,16 @@ class _ItemsSearchViewState extends State<ItemsSearchView> {
   }
 
   Widget loading() {
-    return Container(
-      child:
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-        Loading(
-            indicator: BallScaleMultipleIndicator(),
-            color: Theme.of(context).primaryColor,
-            size: 100.0)
-      ]),
-    );
+    return Expanded(
+        child: Container(
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Loading(
+                indicator: BallPulseIndicator(),
+                color: Theme.of(context).primaryColor,
+                size: 70.0)
+          ]),
+    ));
   }
 }

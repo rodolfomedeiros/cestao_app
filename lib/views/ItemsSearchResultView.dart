@@ -15,16 +15,35 @@ class ItemsSearchResultView extends StatefulWidget {
 }
 
 class _SearchResultState extends State<ItemsSearchResultView> {
+  String _query;
+  ItemsSearchForm searchForm = ItemsSearchForm(query: null);
+
+  void changeButtonQuery(String query) {
+    setState(() {
+      print(query);
+      this._query = query;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    ItemsSearchForm searchForm = ModalRoute.of(context).settings.arguments;
+    searchForm = ModalRoute.of(context).settings.arguments;
+
+    this._query = this._query == null ? searchForm.query : this._query;
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Search Result View'),
       ),
       body: Center(
-        child: Text(searchForm.query),
+        child: RaisedButton(
+          child: Text(this._query),
+          onPressed: () {
+            cestaoService
+                .searchDefault(searchForm)
+                .then((value) => this.changeButtonQuery(value.query));
+          },
+        ),
       ),
     );
   }
