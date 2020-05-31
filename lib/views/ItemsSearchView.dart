@@ -1,9 +1,12 @@
-import 'package:cestao_app/views/ItemsSearchResultView.dart';
-import 'package:cestao_app/models/ItemsSearchForm.dart';
+import 'package:cestao_app/models/BusinessForm.dart';
+import 'package:cestao_app/models/LastSingleSoldItemForm.dart';
 import 'package:flutter/material.dart';
 
 import 'package:loading/loading.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
+
+import 'package:cestao_app/models/ItemsSearchForm.dart';
+import 'package:cestao_app/services/CestaoService.dart' as cestaoService;
 
 class ItemsSearchView extends StatefulWidget {
   ItemsSearchView({Key key, this.title}) : super(key: key);
@@ -19,6 +22,18 @@ class ItemsSearchView extends StatefulWidget {
 class _ItemsSearchViewState extends State<ItemsSearchView> {
   final searchFieldController = TextEditingController();
 
+  bool _searchFinished = false;
+  ItemsSearchForm result = null;
+
+  void _searchAction() {
+    cestaoService.search(searchFieldController.text).then((value) => {
+          this.setState(() {
+            this.result = value;
+            this._searchFinished = true;
+          })
+        });
+  }
+
   @override
   void dispose() {
     searchFieldController.dispose();
@@ -29,41 +44,33 @@ class _ItemsSearchViewState extends State<ItemsSearchView> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Search View'),
+          title: Text('Buscar Produto'),
         ),
         body: Column(children: <Widget>[
-          loading(),
-          searchAndButton(),
+          !_searchFinished ? _loading() : _listItemsByBusiness(result),
+          _searchAndButton(),
         ]));
   }
 
-  Widget searchAndButton() {
+  Widget _searchAndButton() {
     return Container(
         padding: EdgeInsets.all(10.0),
         child: Row(
           children: <Widget>[
             Expanded(
                 child: TextField(
+              autofocus: true,
+              decoration:
+                  InputDecoration(hintText: 'digite o nome e aperte Enter'),
+              onSubmitted: (value) => _searchAction(),
               style: TextStyle(fontSize: 20.0),
               controller: searchFieldController,
             )),
-            RaisedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, ItemsSearchResultView.routeName,
-                    arguments:
-                        ItemsSearchForm(query: searchFieldController.text));
-              },
-              child: Text(
-                'Buscar',
-                style: TextStyle(color: Colors.black, fontSize: 18.0),
-              ),
-              color: Theme.of(context).primaryColor,
-            )
           ],
         ));
   }
 
-  Widget loading() {
+  Widget _loading() {
     return Expanded(
         child: Container(
       child: Column(
@@ -75,5 +82,31 @@ class _ItemsSearchViewState extends State<ItemsSearchView> {
                 size: 70.0)
           ]),
     ));
+  }
+
+  Widget _listItemsByBusiness(ItemsSearchForm result) {
+    return Expanded(
+        child: ListView.separated(
+            padding: const EdgeInsets.all(10.0),
+            itemCount: result.soldItemsByBusiness.length,
+            separatorBuilder: (context, i) => Divider(),
+            itemBuilder: (context, i) =>
+                _buildBusinessRow(result.soldItemsByBusiness[i])));
+  }
+
+  Widget _buildBusinessRow(BusinessForm business) {
+    return ExpansionTile(
+      title: Text(business.name),
+      initiallyExpanded: false,
+      children: business.lastSingleSoldItems.map(_buildItemsRow).toList(),
+    );
+  }
+
+  Widget _buildItemsRow(LastSingleSoldItemForm lastSingleSoldItemForm) {
+    return ListTile(
+      title: Text(lastSingleSoldItemForm.resume),
+      subtitle: Text('Inserido: ${lastSingleSoldItemForm.dateTime}'),
+      trailing: Text(lastSingleSoldItemForm.price.toString()),
+    );
   }
 }

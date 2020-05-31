@@ -38,11 +38,7 @@ class _SearchResultState extends State<ItemsSearchResultView> {
       body: Center(
         child: RaisedButton(
           child: Text(this._query),
-          onPressed: () {
-            cestaoService
-                .searchDefault(searchForm)
-                .then((value) => this.changeButtonQuery(value.query));
-          },
+          onPressed: () {},
         ),
       ),
     );
