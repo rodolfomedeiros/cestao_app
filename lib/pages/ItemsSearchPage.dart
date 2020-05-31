@@ -8,30 +8,48 @@ import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:cestao_app/models/ItemsSearchForm.dart';
 import 'package:cestao_app/services/CestaoService.dart' as cestaoService;
 
-class ItemsSearchView extends StatefulWidget {
-  ItemsSearchView({Key key, this.title}) : super(key: key);
+class ItemsSearchPage extends StatefulWidget {
+  ItemsSearchPage({Key key, this.title}) : super(key: key);
 
   static const String routeName = "/search";
 
   final String title;
 
   @override
-  _ItemsSearchViewState createState() => _ItemsSearchViewState();
+  _ItemsSearchPageState createState() => _ItemsSearchPageState();
 }
 
-class _ItemsSearchViewState extends State<ItemsSearchView> {
+class _ItemsSearchPageState extends State<ItemsSearchPage> {
   final searchFieldController = TextEditingController();
 
+  bool _searchEmpty = true;
+  bool _searchFail = false;
   bool _searchFinished = false;
+  bool _searchLoading = false;
+
   ItemsSearchForm result = null;
 
   void _searchAction() {
-    cestaoService.search(searchFieldController.text).then((value) => {
+    setState(() {
+      this._searchEmpty = false;
+      this._searchLoading = true;
+      cestaoService.search(searchFieldController.text).then((value) {
+        if (value.soldItemsByBusiness.length < 1) {
+          setState(() {
+            this._searchFail = true;
+            this._searchLoading = false;
+            this._searchFinished = false;
+          });
+        } else {
           this.setState(() {
             this.result = value;
+            this._searchLoading = false;
+            this._searchFail = false;
             this._searchFinished = true;
-          })
-        });
+          });
+        }
+      });
+    });
   }
 
   @override
@@ -47,12 +65,16 @@ class _ItemsSearchViewState extends State<ItemsSearchView> {
           title: Text('Buscar Produto'),
         ),
         body: Column(children: <Widget>[
-          !_searchFinished ? _loading() : _listItemsByBusiness(result),
-          _searchAndButton(),
+          if (_searchEmpty) _searchEmptyWidget('Nenhuma busca...'),
+          if (_searchFail)
+            _searchEmptyWidget('Nenhum resultado para essa busca...'),
+          if (_searchFinished) _listItemsByBusiness(result),
+          if (_searchLoading) _loading(),
+          _searchInput(),
         ]));
   }
 
-  Widget _searchAndButton() {
+  Widget _searchInput() {
     return Container(
         padding: EdgeInsets.all(10.0),
         child: Row(
@@ -81,6 +103,17 @@ class _ItemsSearchViewState extends State<ItemsSearchView> {
                 color: Theme.of(context).primaryColor,
                 size: 70.0)
           ]),
+    ));
+  }
+
+  Widget _searchEmptyWidget(String msg) {
+    return Expanded(
+        child: Container(
+      alignment: Alignment.center,
+      child: Text(
+        msg,
+        style: TextStyle(color: Colors.grey),
+      ),
     ));
   }
 

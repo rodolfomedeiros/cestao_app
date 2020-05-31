@@ -1,6 +1,6 @@
-import 'package:cestao_app/views/ItemsSearchResultView.dart';
-import 'package:cestao_app/views/ItemsSearchView.dart';
 import 'package:flutter/material.dart';
+
+import 'package:cestao_app/pages/ItemsSearchPage.dart';
 
 void main() {
   runApp(CestaoApp());
@@ -8,8 +8,7 @@ void main() {
 
 class CestaoApp extends StatelessWidget {
   var routes = <String, WidgetBuilder>{
-    ItemsSearchView.routeName: (context) => ItemsSearchView(),
-    ItemsSearchResultView.routeName: (context) => ItemsSearchResultView(),
+    ItemsSearchPage.routeName: (context) => ItemsSearchPage(),
   };
 
   @override
@@ -19,7 +18,7 @@ class CestaoApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.orange[300],
       ),
-      home: ItemsSearchView(),
+      home: ItemsSearchPage(),
       routes: routes,
     );
   }
