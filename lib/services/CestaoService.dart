@@ -6,12 +6,16 @@ import 'package:cestao_app/models/ItemsSearchForm.dart';
 const urlCestaoBackend = 'http://192.168.0.106:8080/cestao';
 
 Future<ItemsSearchForm> search(String query) async {
-  final response = await http.get(urlCestaoBackend + '?query=$query');
+  try {
+    final response = await http.get(urlCestaoBackend + '?query=$query');
 
-  if (response.statusCode == 200) {
-    return ItemsSearchForm.fromJson(jsonDecode(response.body));
-  } else {
-    throw Exception('search failed');
+    if (response.statusCode == 200) {
+      return ItemsSearchForm.fromJson(jsonDecode(response.body));
+    } else {
+      return ItemsSearchForm.getEmpty(query);
+    }
+  } catch (error) {
+    return ItemsSearchForm.getEmpty(query);
   }
 }
 

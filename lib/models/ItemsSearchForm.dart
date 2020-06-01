@@ -15,4 +15,8 @@ class ItemsSearchForm {
 
     return searchForm;
   }
+
+  factory ItemsSearchForm.getEmpty(String query) {
+    return ItemsSearchForm(query: query, soldItemsByBusiness: <BusinessForm>[]);
+  }
 }
