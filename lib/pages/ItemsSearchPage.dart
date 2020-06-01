@@ -50,6 +50,8 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
             this._searchFinished = true;
           });
         }
+      }).catchError((error) {
+        print(error);
       });
     });
   }

@@ -12,10 +12,11 @@ Future<ItemsSearchForm> search(String query) async {
     if (response.statusCode == 200) {
       return ItemsSearchForm.fromJson(jsonDecode(response.body));
     } else {
-      return ItemsSearchForm.getEmpty(query);
+      return Future<ItemsSearchForm>.error(
+          "server failed: " + response.statusCode.toString());
     }
   } catch (error) {
-    return ItemsSearchForm.getEmpty(query);
+    return Future<ItemsSearchForm>.error(error);
   }
 }
 
