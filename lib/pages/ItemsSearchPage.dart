@@ -33,6 +33,8 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
     setState(() {
       this._searchEmpty = false;
       this._searchLoading = true;
+      this._searchFinished = false;
+      this._searchFail = false;
       cestaoService.search(searchFieldController.text).then((value) {
         if (value.soldItemsByBusiness.length < 1) {
           setState(() {
