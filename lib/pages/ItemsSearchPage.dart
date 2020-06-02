@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:loading/loading.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import 'package:cestao_app/models/BusinessForm.dart';
 import 'package:cestao_app/models/LastSingleSoldItemForm.dart';
@@ -21,6 +22,10 @@ class ItemsSearchPage extends StatefulWidget {
 
 class _ItemsSearchPageState extends State<ItemsSearchPage> {
   final searchFieldController = TextEditingController();
+
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QRCODE');
+  var qrText = "";
+  QRViewController _qrViewController;
 
   int _bottomNavigatorIndexSelected = 0;
 
@@ -74,6 +79,15 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
     setState(() => _bottomNavigatorIndexSelected = index);
   }
 
+  void _onQRViewCreated(QRViewController controller) {
+    this._qrViewController = controller;
+    _qrViewController.scannedDataStream.listen((scanData) {
+      setState(() {
+        qrText = scanData;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     widgets.insert(0, _searchPage());
@@ -81,7 +95,7 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Buscar Produto'),
+        title: Text('Cestão App'),
       ),
       body: widgets.elementAt(_bottomNavigatorIndexSelected),
       bottomNavigationBar: BottomNavigationBar(
@@ -109,11 +123,23 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
   }
 
   Widget _qrCodeScannerPage() {
-    return Column(children: [
-      Expanded(
-        child: Container(child: Center(child: Text("QrCode"))),
-      )
-    ]);
+    return Column(
+      children: <Widget>[
+        Expanded(
+          flex: 5,
+          child: QRView(
+            key: qrKey,
+            onQRViewCreated: _onQRViewCreated,
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: Center(
+            child: Text('Scan result: $qrText'),
+          ),
+        )
+      ],
+    );
   }
 
   Widget _searchInput() {

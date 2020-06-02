@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:cestao_app/models/ItemsSearchForm.dart';
 
-const urlCestaoBackend = 'http://192.168.0.106:8080/cestao';
+const urlCestaoBackend = 'http://192.168.0.114:8080/cestao';
 
 Future<ItemsSearchForm> search(String query) async {
   try {
