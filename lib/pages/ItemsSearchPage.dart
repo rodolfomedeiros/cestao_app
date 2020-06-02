@@ -1,8 +1,9 @@
+import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:loading/loading.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import 'package:cestao_app/models/BusinessForm.dart';
 import 'package:cestao_app/models/LastSingleSoldItemForm.dart';
@@ -23,10 +24,6 @@ class ItemsSearchPage extends StatefulWidget {
 class _ItemsSearchPageState extends State<ItemsSearchPage> {
   final searchFieldController = TextEditingController();
 
-  final GlobalKey qrKey = GlobalKey(debugLabel: 'QRCODE');
-  var qrText = "";
-  QRViewController _qrViewController;
-
   int _bottomNavigatorIndexSelected = 0;
 
   bool _searchEmpty = true;
@@ -35,9 +32,49 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
   bool _searchLoading = false;
   bool _searchReturnEmpty = false;
 
+  ScanResult _scanResult;
   ItemsSearchForm result = null;
 
   List<Widget> widgets = <Widget>[];
+
+  @override
+  void dispose() {
+    searchFieldController?.dispose();
+    super.dispose();
+  }
+
+  Future scan() async {
+    try {
+      var options = ScanOptions(
+        restrictFormat: [BarcodeFormat.qr],
+        useCamera: -1,
+        autoEnableFlash: false,
+        android: AndroidOptions(
+          useAutoFocus: true,
+        ),
+      );
+
+      var result = await BarcodeScanner.scan(options: options);
+
+      setState(() => _scanResult = result);
+    } on PlatformException catch (e) {
+      var result = ScanResult(
+        type: ResultType.Error,
+        format: BarcodeFormat.unknown,
+      );
+
+      if (e.code == BarcodeScanner.cameraAccessDenied) {
+        setState(() {
+          result.rawContent = 'The user did not grant the camera permission!';
+        });
+      } else {
+        result.rawContent = 'Unknown error: $e';
+      }
+      setState(() {
+        _scanResult = result;
+      });
+    }
+  }
 
   void _searchAction() {
     setState(() {
@@ -69,23 +106,9 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
     });
   }
 
-  @override
-  void dispose() {
-    searchFieldController?.dispose();
-    super.dispose();
-  }
-
   void _bottomNavigatorTapped(int index) {
+    if (index == 1) scan();
     setState(() => _bottomNavigatorIndexSelected = index);
-  }
-
-  void _onQRViewCreated(QRViewController controller) {
-    this._qrViewController = controller;
-    _qrViewController.scannedDataStream.listen((scanData) {
-      setState(() {
-        qrText = scanData;
-      });
-    });
   }
 
   @override
@@ -126,16 +149,9 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
     return Column(
       children: <Widget>[
         Expanded(
-          flex: 5,
-          child: QRView(
-            key: qrKey,
-            onQRViewCreated: _onQRViewCreated,
-          ),
-        ),
-        Expanded(
           flex: 1,
           child: Center(
-            child: Text('Scan result: $qrText'),
+            child: Text('Scan result: ${_scanResult.rawContent}'),
           ),
         )
       ],
