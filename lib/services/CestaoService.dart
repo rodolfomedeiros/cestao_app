@@ -3,11 +3,13 @@ import 'package:http/http.dart' as http;
 
 import 'package:cestao_app/models/ItemsSearchForm.dart';
 
-const urlCestaoBackend = 'http://192.168.0.114:8080/cestao';
+const urlCestaoBackend = 'http://192.168.0.109:8080';
+const urlCestaoController = urlCestaoBackend + '/cestao';
+const urlNfceController = urlCestaoBackend + '/nfce';
 
 Future<ItemsSearchForm> search(String query) async {
   try {
-    final response = await http.get(urlCestaoBackend + '?query=$query');
+    final response = await http.get(urlCestaoController + '?query=$query');
 
     if (response.statusCode == 200) {
       return ItemsSearchForm.fromJson(jsonDecode(response.body));
@@ -17,6 +19,20 @@ Future<ItemsSearchForm> search(String query) async {
     }
   } catch (error) {
     return Future<ItemsSearchForm>.error(error);
+  }
+}
+
+Future nfceSend(String key) async {
+  try {
+    final response = await http.get(urlNfceController + '/$key');
+
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      return Future.error("server failed: " + response.statusCode.toString());
+    }
+  } catch (error) {
+    return Future.error(error);
   }
 }
 

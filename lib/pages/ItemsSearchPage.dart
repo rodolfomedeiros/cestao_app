@@ -1,4 +1,5 @@
 import 'package:barcode_scan/barcode_scan.dart';
+import 'package:cestao_app/models/Nfce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -33,6 +34,8 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
   bool _searchReturnEmpty = false;
 
   ScanResult _scanResult;
+  String _resultKey = "";
+  String _resultKeyReturn = "";
   ItemsSearchForm result = null;
 
   List<Widget> widgets = <Widget>[];
@@ -106,9 +109,23 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
     });
   }
 
-  void _bottomNavigatorTapped(int index) {
-    if (index == 1) scan();
-    setState(() => _bottomNavigatorIndexSelected = index);
+  void _bottomNavigatorTapped(int index) async {
+    if (index == 1) {
+      await scan();
+
+      if (_scanResult.rawContent.isNotEmpty) {
+        _resultKey = Nfce.fromRawContent(_scanResult.rawContent).key;
+
+        cestaoService.nfceSend(_resultKey).then((value) => setState(() {
+              _scanResult;
+              _resultKey;
+              _resultKeyReturn = value;
+              _bottomNavigatorIndexSelected = index;
+            }));
+      }
+    } else {
+      setState(() => _bottomNavigatorIndexSelected = index);
+    }
   }
 
   @override
@@ -151,7 +168,7 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
         Expanded(
           flex: 1,
           child: Center(
-            child: Text('Scan result: ${_scanResult.rawContent}'),
+            child: Text('Scan result: $_resultKeyReturn'),
           ),
         )
       ],
@@ -214,7 +231,7 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
   Widget _buildBusinessRow(BusinessForm business) {
     return ExpansionTile(
       title: Text(business.name),
-      initiallyExpanded: false,
+      initiallyExpanded: true,
       children: business.lastSingleSoldItems.map(_buildItemsRow).toList(),
     );
   }
