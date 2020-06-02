@@ -22,12 +22,17 @@ class ItemsSearchPage extends StatefulWidget {
 class _ItemsSearchPageState extends State<ItemsSearchPage> {
   final searchFieldController = TextEditingController();
 
+  int _bottomNavigatorIndexSelected = 0;
+
   bool _searchEmpty = true;
   bool _searchFail = false;
   bool _searchFinished = false;
   bool _searchLoading = false;
+  bool _searchReturnEmpty = false;
 
   ItemsSearchForm result = null;
+
+  List<Widget> widgets = <Widget>[];
 
   void _searchAction() {
     setState(() {
@@ -35,12 +40,14 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
       this._searchLoading = true;
       this._searchFinished = false;
       this._searchFail = false;
+      this._searchReturnEmpty = false;
       cestaoService.search(searchFieldController.text).then((value) {
         if (value.soldItemsByBusiness.length < 1) {
           setState(() {
-            this._searchFail = true;
+            this._searchFail = false;
             this._searchLoading = false;
             this._searchFinished = false;
+            this._searchReturnEmpty = true;
           });
         } else {
           this.setState(() {
@@ -48,6 +55,7 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
             this._searchLoading = false;
             this._searchFail = false;
             this._searchFinished = true;
+            this._searchReturnEmpty = false;
           });
         }
       }).catchError((error) {
@@ -58,24 +66,54 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
 
   @override
   void dispose() {
-    searchFieldController.dispose();
+    searchFieldController?.dispose();
     super.dispose();
+  }
+
+  void _bottomNavigatorTapped(int index) {
+    setState(() => _bottomNavigatorIndexSelected = index);
   }
 
   @override
   Widget build(BuildContext context) {
+    widgets.insert(0, _searchPage());
+    widgets.insert(1, _qrCodeScannerPage());
+
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Buscar Produto'),
-        ),
-        body: Column(children: <Widget>[
-          if (_searchEmpty) _searchEmptyWidget('Nenhuma busca...'),
-          if (_searchFail)
-            _searchEmptyWidget('Nenhum resultado para essa busca...'),
-          if (_searchFinished) _listItemsByBusiness(result),
-          if (_searchLoading) _loading(),
-          _searchInput(),
-        ]));
+      appBar: AppBar(
+        title: Text('Buscar Produto'),
+      ),
+      body: widgets.elementAt(_bottomNavigatorIndexSelected),
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+              icon: Icon(Icons.search), title: Text("Buscar Produto")),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.add), title: Text('Adicionar Nova Chave'))
+        ],
+        currentIndex: _bottomNavigatorIndexSelected,
+        onTap: _bottomNavigatorTapped,
+      ),
+    );
+  }
+
+  Widget _searchPage() {
+    return Column(children: <Widget>[
+      if (_searchEmpty) _searchEmptyWidget('Nenhuma busca...'),
+      if (_searchReturnEmpty)
+        _searchEmptyWidget('Nenhum resultado para essa busca...'),
+      if (_searchFinished) _listItemsByBusiness(result),
+      if (_searchLoading) _loading(),
+      _searchInput(),
+    ]);
+  }
+
+  Widget _qrCodeScannerPage() {
+    return Column(children: [
+      Expanded(
+        child: Container(child: Center(child: Text("QrCode"))),
+      )
+    ]);
   }
 
   Widget _searchInput() {
