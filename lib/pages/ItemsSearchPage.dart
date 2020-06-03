@@ -163,14 +163,41 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
   }
 
   Widget _qrCodeScannerPage() {
+    return Column(children: [
+      Expanded(
+          child: Container(
+              alignment: Alignment.center,
+              child: _resultKeyReturn.compareTo("CREATED") == 0
+                  ? _qrCodeSaveKeyCreated()
+                  : _qrCodeSaveKeyConflict()))
+    ]);
+  }
+
+  Widget _qrCodeSaveKeyCreated() {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Expanded(
-          flex: 1,
-          child: Center(
-            child: Text('Scan result: $_resultKeyReturn'),
-          ),
-        )
+        Icon(
+          Icons.beenhere,
+          color: Colors.greenAccent,
+          size: 40.0,
+        ),
+        Text("Nova chave adicionada com sucesso!")
+      ],
+    );
+  }
+
+  Widget _qrCodeSaveKeyConflict() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Icon(
+          Icons.assignment_late,
+          color: Colors.redAccent,
+          size: 40.0,
+        ),
+        Text("Não foi possível adicionar a chave!"),
+        Text("Pode ser que ela já tenha sido adicionada...")
       ],
     );
   }
