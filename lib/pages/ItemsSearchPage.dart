@@ -36,7 +36,7 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
   ScanResult _scanResult;
   String _resultKey = "";
   String _resultKeyReturn = "";
-  ItemsSearchForm result = null;
+  ItemsSearchForm result;
 
   List<Widget> widgets = <Widget>[];
 
@@ -116,12 +116,18 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
       if (_scanResult.rawContent.isNotEmpty) {
         _resultKey = Nfce.fromRawContent(_scanResult.rawContent).key;
 
-        cestaoService.nfceSend(_resultKey).then((value) => setState(() {
-              _scanResult;
-              _resultKey;
-              _resultKeyReturn = value;
-              _bottomNavigatorIndexSelected = index;
-            }));
+        _resultKeyReturn = "";
+
+        cestaoService
+            .nfceSend(_resultKey)
+            .then((value) => setState(() {
+                  _resultKeyReturn = value;
+                  _bottomNavigatorIndexSelected = index;
+                }))
+            .catchError((error) => setState(() {
+                  _resultKeyReturn = error;
+                  _bottomNavigatorIndexSelected = index;
+                }));
       }
     } else {
       setState(() => _bottomNavigatorIndexSelected = index);
@@ -167,39 +173,54 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
       Expanded(
           child: Container(
               alignment: Alignment.center,
-              child: _resultKeyReturn.compareTo("CREATED") == 0
-                  ? _qrCodeSaveKeyCreated()
-                  : _qrCodeSaveKeyConflict()))
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: _resultKeyReturn.isEmpty
+                      ? _loadingSaveKey()
+                      : _qrCodeResult(_resultKeyReturn))))
     ]);
   }
 
-  Widget _qrCodeSaveKeyCreated() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Icon(
-          Icons.beenhere,
-          color: Colors.greenAccent,
-          size: 40.0,
-        ),
-        Text("Nova chave adicionada com sucesso!")
-      ],
-    );
+  List<Widget> _qrCodeResult(String result) {
+    if (result.contains("CREATED")) return _qrCodeSaveKeyCreated();
+    if (result.contains("CONFLICT")) return _qrCodeSaveKeyConflict();
+
+    return _qrCodeKeyError();
   }
 
-  Widget _qrCodeSaveKeyConflict() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Icon(
-          Icons.assignment_late,
-          color: Colors.redAccent,
-          size: 40.0,
-        ),
-        Text("Não foi possível adicionar a chave!"),
-        Text("Pode ser que ela já tenha sido adicionada...")
-      ],
-    );
+  List<Widget> _qrCodeKeyError() {
+    return <Widget>[
+      Icon(
+        Icons.report_problem,
+        color: Colors.redAccent,
+        size: 40.0,
+      ),
+      Text("OPS.."),
+      Text("Desculpa, não foi possível salvar a chave...")
+    ];
+  }
+
+  List<Widget> _qrCodeSaveKeyCreated() {
+    return <Widget>[
+      Icon(
+        Icons.beenhere,
+        color: Colors.greenAccent,
+        size: 40.0,
+      ),
+      Text("Nova chave adicionada com sucesso!")
+    ];
+  }
+
+  List<Widget> _qrCodeSaveKeyConflict() {
+    return <Widget>[
+      Icon(
+        Icons.assignment_late,
+        color: Colors.redAccent,
+        size: 40.0,
+      ),
+      Text("Não foi possível adicionar a chave!"),
+      Text("Pode ser que ela já tenha sido adicionada...")
+    ];
   }
 
   Widget _searchInput() {
@@ -211,7 +232,7 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
                 child: TextField(
               autofocus: true,
               decoration:
-                  InputDecoration(hintText: 'digite o nome e aperte Enter'),
+                  InputDecoration(hintText: 'Nome do produto e aperte Enter'),
               onSubmitted: (value) => _searchAction(),
               style: TextStyle(fontSize: 20.0),
               controller: searchFieldController,
@@ -220,16 +241,28 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
         ));
   }
 
+  List<Widget> _loadingSaveKey() {
+    return <Widget>[
+      Loading(
+          indicator: BallPulseIndicator(),
+          color: Theme.of(context).primaryColor,
+          size: 70.0),
+      Text("Salvando chave..."),
+    ];
+  }
+
   Widget _loading() {
     return Expanded(
         child: Container(
+      alignment: Alignment.center,
       child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Loading(
                 indicator: BallPulseIndicator(),
                 color: Theme.of(context).primaryColor,
-                size: 70.0)
+                size: 70.0),
+            Text("Buscando produtos...")
           ]),
     ));
   }

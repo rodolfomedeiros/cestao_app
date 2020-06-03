@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import 'package:cestao_app/models/ItemsSearchForm.dart';
@@ -31,8 +32,8 @@ Future nfceSend(String key) async {
     } else {
       return Future.error("server failed: " + response.statusCode.toString());
     }
-  } catch (error) {
-    return Future.error(error);
+  } on SocketException catch (error) {
+    return Future.error(error.toString());
   }
 }
 
