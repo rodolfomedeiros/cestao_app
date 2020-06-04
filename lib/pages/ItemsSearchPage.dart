@@ -105,6 +105,11 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
         }
       }).catchError((error) {
         print(error);
+        this._searchEmpty = false;
+        this._searchLoading = false;
+        this._searchFinished = false;
+        this._searchFail = true;
+        this._searchReturnEmpty = false;
       });
     });
   }
@@ -164,6 +169,14 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
         _searchEmptyWidget('Nenhum resultado para essa busca...'),
       if (_searchFinished) _listItemsByBusiness(result),
       if (_searchLoading) _loading(),
+      if (_searchFail)
+        Expanded(
+            child: Container(
+                alignment: Alignment.center,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: _serverError(
+                        "Desculpa, tente novamente mais tarde...")))),
       _searchInput(),
     ]);
   }
@@ -185,10 +198,10 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
     if (result.contains("CREATED")) return _qrCodeSaveKeyCreated();
     if (result.contains("CONFLICT")) return _qrCodeSaveKeyConflict();
 
-    return _qrCodeKeyError();
+    return _serverError("Desculpa, não foi possível salvar a chave...");
   }
 
-  List<Widget> _qrCodeKeyError() {
+  List<Widget> _serverError(String error) {
     return <Widget>[
       Icon(
         Icons.report_problem,
@@ -196,7 +209,7 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
         size: 40.0,
       ),
       Text("OPS.."),
-      Text("Desculpa, não foi possível salvar a chave...")
+      Text(error)
     ];
   }
 
