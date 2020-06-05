@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:cestao_app/models/ItemsSearchForm.dart';
 
-const urlCestaoBackend = 'http://192.168.0.109:8080';
+const urlCestaoBackend = 'http://100.66.2.215:8080';
 const urlCestaoController = urlCestaoBackend + '/cestao';
 const urlNfceController = urlCestaoBackend + '/nfce';
 

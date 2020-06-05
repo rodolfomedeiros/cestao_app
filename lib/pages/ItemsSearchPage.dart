@@ -155,7 +155,10 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cestão App'),
+        title: Text(
+          'Buscando um produto?!',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: widgets.elementAt(_bottomNavigatorIndexSelected),
       bottomNavigationBar: BottomNavigationBar(
@@ -266,7 +269,7 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
                 child: TextField(
               autofocus: true,
               decoration:
-                  InputDecoration(hintText: 'Nome do produto e aperte Enter'),
+                  InputDecoration(hintText: 'nome do produto e aperte enter'),
               onSubmitted: (value) => _searchAction(),
               style: TextStyle(fontSize: 20.0),
               controller: searchFieldController,

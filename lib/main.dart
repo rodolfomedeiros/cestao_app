@@ -15,9 +15,7 @@ class CestaoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "Cestão App",
-      theme: ThemeData(
-        primaryColor: Color.fromRGBO(176, 44, 15, 1.0),
-      ),
+      theme: ThemeData(primaryColor: Color.fromRGBO(78, 187, 183, 1.0)),
       home: ItemsSearchPage(),
       routes: routes,
     );
