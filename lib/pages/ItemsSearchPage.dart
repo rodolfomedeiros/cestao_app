@@ -95,7 +95,7 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
             this._searchReturnEmpty = true;
           });
         } else {
-          this.setState(() {
+          setState(() {
             this.result = value;
             this._searchLoading = false;
             this._searchFail = false;
@@ -105,11 +105,13 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
         }
       }).catchError((error) {
         print(error);
-        this._searchEmpty = false;
-        this._searchLoading = false;
-        this._searchFinished = false;
-        this._searchFail = true;
-        this._searchReturnEmpty = false;
+        setState(() {
+          this._searchEmpty = false;
+          this._searchLoading = false;
+          this._searchFinished = false;
+          this._searchFail = true;
+          this._searchReturnEmpty = false;
+        });
       });
     });
   }
@@ -123,16 +125,23 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
 
         _resultKeyReturn = "";
 
-        cestaoService
-            .nfceSend(_resultKey)
-            .then((value) => setState(() {
-                  _resultKeyReturn = value;
-                  _bottomNavigatorIndexSelected = index;
-                }))
-            .catchError((error) => setState(() {
-                  _resultKeyReturn = error;
-                  _bottomNavigatorIndexSelected = index;
-                }));
+        if (_resultKey.isEmpty) {
+          setState(() {
+            _resultKeyReturn = "ERROR";
+            _bottomNavigatorIndexSelected = index;
+          });
+        } else {
+          cestaoService
+              .nfceSend(_resultKey)
+              .then((value) => setState(() {
+                    _resultKeyReturn = value;
+                    _bottomNavigatorIndexSelected = index;
+                  }))
+              .catchError((error) => setState(() {
+                    _resultKeyReturn = error;
+                    _bottomNavigatorIndexSelected = index;
+                  }));
+        }
       }
     } else {
       setState(() => _bottomNavigatorIndexSelected = index);
@@ -197,6 +206,7 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
   List<Widget> _qrCodeResult(String result) {
     if (result.contains("CREATED")) return _qrCodeSaveKeyCreated();
     if (result.contains("CONFLICT")) return _qrCodeSaveKeyConflict();
+    if (result.contains("ERROR")) return _qrCodeKeyError();
 
     return _serverError("Desculpa, não foi possível salvar a chave...");
   }
@@ -233,6 +243,17 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
       ),
       Text("Não foi possível adicionar a chave!"),
       Text("Pode ser que ela já tenha sido adicionada...")
+    ];
+  }
+
+  List<Widget> _qrCodeKeyError() {
+    return <Widget>[
+      Icon(
+        Icons.assignment_late,
+        color: Colors.redAccent,
+        size: 40.0,
+      ),
+      Text("Não foi possível ler o QrCode!"),
     ];
   }
 

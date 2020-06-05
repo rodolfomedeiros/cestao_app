@@ -6,7 +6,8 @@ class Nfce {
   Nfce(this.key);
 
   factory Nfce.fromRawContent(String rawContent) {
-    print(rawContent);
-    return Nfce(Nfce.keyFormat.stringMatch(rawContent));
+    Nfce nfce = Nfce(Nfce.keyFormat.stringMatch(rawContent));
+
+    return nfce.key != null ? nfce : Nfce("");
   }
 }
