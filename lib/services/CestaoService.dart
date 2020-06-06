@@ -4,9 +4,9 @@ import 'package:http/http.dart' as http;
 
 import 'package:cestao_app/models/ItemsSearchForm.dart';
 
-const urlCestaoBackend = 'http://100.66.2.215:8080';
-const urlCestaoController = urlCestaoBackend + '/cestao';
-const urlNfceController = urlCestaoBackend + '/nfce';
+const URL_CESTAO_BACKEND = String.fromEnvironment('URL_CESTAO_BACKEND');
+const urlCestaoController = URL_CESTAO_BACKEND + '/cestao';
+const urlNfceController = URL_CESTAO_BACKEND + '/nfce';
 
 Future<ItemsSearchForm> search(String query) async {
   try {
