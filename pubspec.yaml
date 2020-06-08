@@ -33,9 +33,7 @@ dependencies:
   barcode_scan: ^3.0.1
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-
+  test: ^1.14.7
   flutter_launcher_icons: "^0.7.3"
 
 flutter_icons:

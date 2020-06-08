@@ -6,7 +6,7 @@ import 'package:cestao_app/models/ItemsSearchForm.dart';
 
 const URL_CESTAO_BACKEND = String.fromEnvironment('URL_CESTAO_BACKEND');
 const urlCestaoController = URL_CESTAO_BACKEND + '/cestao';
-const urlNfceController = URL_CESTAO_BACKEND + '/nfce';
+const urlNfceStore = URL_CESTAO_BACKEND + '/nfce/store';
 
 Future<ItemsSearchForm> search(String query) async {
   try {
@@ -23,10 +23,12 @@ Future<ItemsSearchForm> search(String query) async {
   }
 }
 
-Future nfceSend(String key) async {
+Future<String> nfceSend(String key) async {
   try {
-    final response = await http.get(urlNfceController + '/$key');
-
+    print(key);
+    final response =
+        await http.post(urlNfceStore, body: json.encode({"nfceKey": key}));
+    print(response.body);
     if (response.statusCode == 200) {
       return response.body;
     } else {

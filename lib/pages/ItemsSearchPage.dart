@@ -138,6 +138,7 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
                     _bottomNavigatorIndexSelected = index;
                   }))
               .catchError((error) => setState(() {
+                    print(error);
                     _resultKeyReturn = error;
                     _bottomNavigatorIndexSelected = index;
                   }));
