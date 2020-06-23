@@ -27,11 +27,8 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
 
   int _bottomNavigatorIndexSelected = 0;
 
-  bool _searchEmpty = true;
-  bool _searchFail = false;
-  bool _searchFinished = false;
-  bool _searchLoading = false;
-  bool _searchReturnEmpty = false;
+  ItemsSearchScreenStatus _itemsSearchScreenStatus =
+      ItemsSearchScreenStatus.EMPTY;
 
   ScanResult _scanResult;
   String _resultKey = "";
@@ -81,36 +78,22 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
 
   void _searchAction() {
     setState(() {
-      this._searchEmpty = false;
-      this._searchLoading = true;
-      this._searchFinished = false;
-      this._searchFail = false;
-      this._searchReturnEmpty = false;
+      _itemsSearchScreenStatus = ItemsSearchScreenStatus.EMPTY;
       cestaoService.search(searchFieldController.text).then((value) {
         if (value.soldItemsByBusiness.length < 1) {
           setState(() {
-            this._searchFail = false;
-            this._searchLoading = false;
-            this._searchFinished = false;
-            this._searchReturnEmpty = true;
+            _itemsSearchScreenStatus = ItemsSearchScreenStatus.RETURN_EMPTY;
           });
         } else {
           setState(() {
             this.result = value;
-            this._searchLoading = false;
-            this._searchFail = false;
-            this._searchFinished = true;
-            this._searchReturnEmpty = false;
+            _itemsSearchScreenStatus = ItemsSearchScreenStatus.FINISHED;
           });
         }
       }).catchError((error) {
         print(error);
         setState(() {
-          this._searchEmpty = false;
-          this._searchLoading = false;
-          this._searchFinished = false;
-          this._searchFail = true;
-          this._searchReturnEmpty = false;
+          _itemsSearchScreenStatus = ItemsSearchScreenStatus.FAIL;
         });
       });
     });
@@ -176,20 +159,34 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
   }
 
   Widget _searchPage() {
-    return Column(children: <Widget>[
-      if (_searchEmpty) _searchEmptyWidget('Nenhuma busca...'),
-      if (_searchReturnEmpty)
-        _searchEmptyWidget('Nenhum resultado para essa busca...'),
-      if (_searchFinished) _listItemsByBusiness(result),
-      if (_searchLoading) _loading(),
-      if (_searchFail)
-        Expanded(
+    Widget itemsSearchScreen;
+
+    switch (_itemsSearchScreenStatus) {
+      case ItemsSearchScreenStatus.EMPTY:
+        itemsSearchScreen = _searchEmptyWidget('Nenhuma busca...');
+        break;
+      case ItemsSearchScreenStatus.RETURN_EMPTY:
+        itemsSearchScreen =
+            _searchEmptyWidget('Nenhum resultado para essa busca...');
+        break;
+      case ItemsSearchScreenStatus.FINISHED:
+        itemsSearchScreen = _listItemsByBusiness(result);
+        break;
+      case ItemsSearchScreenStatus.LOADING:
+        itemsSearchScreen = _loading();
+        break;
+      case ItemsSearchScreenStatus.FAIL:
+        itemsSearchScreen = Expanded(
             child: Container(
                 alignment: Alignment.center,
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: _serverError(
-                        "Desculpa, tente novamente mais tarde...")))),
+                        "Desculpa, tente novamente mais tarde..."))));
+    }
+
+    return Column(children: <Widget>[
+      itemsSearchScreen,
       _searchInput(),
     ]);
   }
@@ -342,3 +339,5 @@ class _ItemsSearchPageState extends State<ItemsSearchPage> {
     );
   }
 }
+
+enum ItemsSearchScreenStatus { EMPTY, FAIL, FINISHED, LOADING, RETURN_EMPTY }
